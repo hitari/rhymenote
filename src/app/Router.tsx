@@ -1,17 +1,17 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
-import { RhymeSearch } from '../features/rhymeSearch/RhymeSearch';
-import { RhymeList } from '../features/rhymeList/RhymeList';
+import { RhymeSearchPage } from '../features/rhymeSearch/RhymeSearchPage';
+import { RhymeListPage } from '../features/rhymeList/RhymeListPage';
 
 export function Router() {
   return (
     <Switch>
       <Route exact path="/">
-        <RhymeSearch />
+        <RhymeSearchPage />
       </Route>
       <Route path="/list">
-        <RhymeSearch />
-        <RhymeList />
+        <RhymeSearchPage />
+        <RhymeListPage />
       </Route>
     </Switch>
   );

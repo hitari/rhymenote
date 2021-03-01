@@ -1,7 +1,18 @@
 import React from 'react';
 import { RhymeItem } from './RhymeItem';
 
-export function RhymeList() {
+interface List {
+  no: number;
+  subject: string;
+  mean: string;
+}
+
+interface Props {
+  list: List[];
+}
+
+export function RhymeList({ list }: Props) {
+  console.log('RhymeList', list);
   return (
     <article id="content">
       <h3 id="tabKo" className="tab_result_left selected">
@@ -14,7 +25,9 @@ export function RhymeList() {
       </h3>
       <section id="resultKo" className="box_result selected">
         <ul>
-          <RhymeItem />
+          {list.map((item) => (
+            <RhymeItem key={item.no} subject={item.subject} mean={item.mean} />
+          ))}
         </ul>
       </section>
       <h3 id="tabEng" className="tab_result_right">

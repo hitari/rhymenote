@@ -5,7 +5,7 @@ import { SearchForm } from './SearchForm';
 import { WordList } from './WordList';
 import img from '../../images/tit_rhymenote.png';
 
-export function RhymeSearch() {
+export function RhymeSearchPage() {
   const { value } = useSelector((state: RootState) => state.rhymeSearch);
 
   return (
