@@ -2,6 +2,7 @@ import React, { useState, ChangeEvent } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../app/rootReducer';
 import { setSearchWords, setSearchValue } from './RhymeSearchSlice';
+import { fetchRhymeList } from '../rhymeList/RhymeListSlice';
 import { StringToArray } from '../../utils/stringUtils';
 import { wordconvert } from '../../utils/convertUtils';
 
@@ -57,8 +58,13 @@ export function SearchForm() {
     convertValue(e.target.value);
   };
 
-  const onClicked = () => {
+  const onSearchClicked = () => {
     console.log('onClicked', value, convertedValue, searchWords);
+    if (!value) {
+      alert('빈값은 조회가 되지 않습니다.');
+      return;
+    }
+    dispatch(fetchRhymeList(searchWords));
   };
 
   return (
@@ -86,7 +92,7 @@ export function SearchForm() {
             </label>
             <input type="checkbox" name="inpSimilar" className="inp_similar" title="ㅐ와ㅔ 함께 검색" />
           </div>
-          <button type="button" className="btn_submit" onClick={onClicked}>
+          <button type="button" className="btn_submit" onClick={onSearchClicked}>
             검색
           </button>
         </fieldset>
