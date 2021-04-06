@@ -10,7 +10,6 @@ function createMarkup(mean: string) {
 }
 
 export function RhymeItem({ subject, mean }: Props) {
-  console.log('d');
   return (
     <li>
       <p className="txt_title">

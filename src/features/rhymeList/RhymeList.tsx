@@ -12,7 +12,6 @@ interface Props {
 }
 
 export function RhymeList({ list }: Props) {
-  console.log('RhymeList', list);
   return (
     <article id="content">
       <h3 id="tabKo" className="tab_result_left selected">

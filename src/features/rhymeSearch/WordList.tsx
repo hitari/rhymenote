@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../../app/rootReducer';
+import { RootState } from '@/app/rootReducer';
 import { WordItem } from './WordItem';
-import { StringToArray } from '../../utils/stringUtils';
+import { StringToArray } from '@/utils/stringUtils';
 import { setSearchChar, setSeletedValue } from './RhymeSearchSlice';
 
 interface Character {

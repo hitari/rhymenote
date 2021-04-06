@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import className from 'classnames';
 import deepmerge from 'deepmerge';
-import { wordconvert } from '../../utils/convertUtils';
+import { wordconvert } from '@/utils/convertUtils';
 
 interface Character {
   char?: string;

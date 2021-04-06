@@ -1,10 +1,10 @@
 import React, { useState, ChangeEvent } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../../app/rootReducer';
-import { setSearchWords, setSearchValue } from './RhymeSearchSlice';
+import { RootState } from '@/app/rootReducer';
+import { setSearchWords, setSearchValue, setMoumWords } from './RhymeSearchSlice';
 import { fetchRhymeList } from '../rhymeList/RhymeListSlice';
-import { StringToArray } from '../../utils/stringUtils';
-import { wordconvert } from '../../utils/convertUtils';
+import { StringToArray } from '@/utils/stringUtils';
+import { wordconvert } from '@/utils/convertUtils';
 
 type InputEvent = ChangeEvent<HTMLInputElement>;
 type ChangeHandler = (e: InputEvent) => void;
@@ -58,13 +58,236 @@ export function SearchForm() {
     convertValue(e.target.value);
   };
 
+  /** 
+		단일 자음 - ㄱ,ㄴ,ㄷ,ㄹ... (ㄸ,ㅃ,ㅉ은 단일자음(초성)으로 쓰이지만 단일자음으론 안쓰임) 
+		rt-I/sw-J/sg-K/fr-L/fa-M/fq-N/ft-S/fx-U/fv-V/fg-X/qt-Y
+	*/
+  const choSungEng = [
+    'r',
+    'R',
+    'I',
+    's',
+    'J',
+    'K',
+    'e',
+    'E',
+    'f',
+    'L',
+    'M',
+    'N',
+    'S',
+    'U',
+    'V',
+    'X',
+    'a',
+    'q',
+    'Q',
+    'Y',
+    't',
+    'T',
+    'd',
+    'w',
+    'W',
+    'c',
+    'z',
+    'x',
+    'v',
+    'g',
+  ];
+
+  const choSungKr = [
+    'ㄱ',
+    'ㄲ',
+    'ㄳ',
+    'ㄴ',
+    'ㄵ',
+    'ㄶ',
+    'ㄷ',
+    'ㄸ',
+    'ㄹ',
+    'ㄺ',
+    'ㄻ',
+    'ㄼ',
+    'ㄽ',
+    'ㄾ',
+    'ㄿ',
+    'ㅀ',
+    'ㅁ',
+    'ㅂ',
+    'ㅃ',
+    'ㅄ',
+    'ㅅ',
+    'ㅆ',
+    'ㅇ',
+    'ㅈ',
+    'ㅉ',
+    'ㅊ',
+    'ㅋ',
+    'ㅌ',
+    'ㅍ',
+    'ㅎ',
+  ];
+
+  /** 
+		중성 - 가(ㅏ), 야(ㅑ), 뺨(ㅑ)
+		hk-A/ho-B/hl-C/nj-D/np-F/nl-G/ml-H
+	*/
+  const jungSungEng = [
+    'k',
+    'o',
+    'i',
+    'O',
+    'j',
+    'p',
+    'u',
+    'P',
+    'h',
+    'A',
+    'B',
+    'C',
+    'y',
+    'n',
+    'D',
+    'F',
+    'G',
+    'b',
+    'm',
+    'H',
+    'l',
+  ];
+
+  const jungSungKr = [
+    'ㅏ',
+    'ㅐ',
+    'ㅑ',
+    'ㅒ',
+    'ㅓ',
+    'ㅔ',
+    'ㅕ',
+    'ㅖ',
+    'ㅗ',
+    'ㅘ',
+    'ㅙ',
+    'ㅚ',
+    'ㅛ',
+    'ㅜ',
+    'ㅝ',
+    'ㅞ',
+    'ㅟ',
+    'ㅠ',
+    'ㅡ',
+    'ㅢ',
+    'ㅣ',
+  ];
+
+  /** 
+		종성 - 가(없음), 갈(ㄹ) 천(ㄴ) 
+		rt-I/sw-J/sg-K/fr-L/fa-M/fq-N/ft-S/fx-U/fv-V/fg-X/qt-Y
+	*/
+  const jongSungEng = [
+    'r',
+    'R',
+    'I',
+    's',
+    'J',
+    'K',
+    'e',
+    'f',
+    'L',
+    'M',
+    'N',
+    'S',
+    'U',
+    'V',
+    'X',
+    'a',
+    'q',
+    'k',
+    't',
+    'T',
+    'd',
+    'w',
+    'c',
+    'z',
+    'x',
+    'v',
+    'g',
+  ];
+
+  const jongSungKr = [
+    'ㄱ',
+    'ㄲ',
+    'ㄳ',
+    'ㄴ',
+    'ㄵ',
+    'ㄶ',
+    'ㄷ',
+    'ㄹ',
+    'ㄺ',
+    'ㄻ',
+    'ㄼ',
+    'ㄽ',
+    'ㄾ',
+    'ㄿ',
+    'ㅀ',
+    'ㅁ',
+    'ㅂ',
+    'ㅄ',
+    'ㅅ',
+    'ㅆ',
+    'ㅇ',
+    'ㅈ',
+    'ㅊ',
+    'ㅋ',
+    'ㅌ',
+    'ㅍ',
+    'ㅎ',
+  ];
+
+  const koToEn = (word: any) => {
+    const verificationData = [
+      { name: 'cho', enCollection: choSungEng, krCollection: choSungKr },
+      { name: 'jung', enCollection: jungSungEng, krCollection: jungSungKr },
+      { name: 'jong', enCollection: jongSungEng, krCollection: jongSungKr },
+    ];
+
+    const changedWord = verificationData.map(
+      (item: { name: string; enCollection: string[]; krCollection: string[] }) => {
+        const syllable = word[item.name];
+        console.log('syllable', syllable);
+        // 선택이 안되거나 값이 없을경우 빈값 처리
+        if (!syllable.selected || !syllable.char) return '\\w';
+        // -1 일때 입력받은 char을 리턴 한다.
+        const num = item.krCollection.indexOf(syllable.char);
+        return item.enCollection[num] || syllable.char;
+      }
+    );
+
+    return changedWord;
+  };
+
+  const syllableConversion = (searchWords: any) => {
+    return searchWords.map((item: any, index: number) => {
+      return koToEn(item).join('');
+    });
+  };
+
+  const onMoumClicked = () => {
+    console.log('searchWords', searchWords);
+    dispatch(setMoumWords({ searchWords }));
+  };
+
   const onSearchClicked = () => {
     console.log('onClicked', value, convertedValue, searchWords);
     if (!value) {
       alert('빈값은 조회가 되지 않습니다.');
       return;
     }
-    dispatch(fetchRhymeList(searchWords));
+
+    const l = syllableConversion(searchWords);
+    console.log(l, l.join('/'));
+
+    dispatch(fetchRhymeList(l.join('/')));
   };
 
   return (
@@ -81,7 +304,7 @@ export function SearchForm() {
             onChange={onSearchInputChanged}
           />
           <div className="box_set">
-            <button type="button" className="btn_moum">
+            <button type="button" className="btn_moum" onClick={onMoumClicked}>
               모음
             </button>
             <button type="button" className="btn_reset">

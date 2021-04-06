@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AppThunk, RootState } from '../../app/store';
+import { AppThunk, RootState } from '@/app/store';
 import deepmerge from 'deepmerge';
+import { current } from '@reduxjs/toolkit';
 
 interface Character {
   char?: string;
@@ -41,6 +42,18 @@ export const rhymeSearchSlice = createSlice({
       const { searchWords } = payload;
       state.searchWords = searchWords;
     },
+    setMoumWords(state, { payload }: PayloadAction<{ searchWords: Word[] }>) {
+      const { searchWords } = payload;
+      console.log('setMoumWords searchWords', searchWords);
+      const copy = state.searchWords.map((item) => {
+        item.cho.selected = false;
+        item.jong.selected = false;
+        item.jung.selected = false;
+      });
+      console.log('state.searchWords', current(state.searchWords));
+      console.log('state.copy', copy);
+      // state.searchWords = l;
+    },
     setSearchChar(state, { payload }: PayloadAction<{ id: number; charSelect: Word }>) {
       const { id, charSelect } = payload;
       state.searchWords[id] = deepmerge(state.searchWords[id], charSelect);
@@ -56,6 +69,12 @@ export const rhymeSearchSlice = createSlice({
   },
 });
 
-export const { setSearchWords, setSearchChar, setSearchValue, setSeletedValue } = rhymeSearchSlice.actions;
+export const {
+  setSearchWords,
+  setSearchChar,
+  setMoumWords,
+  setSearchValue,
+  setSeletedValue,
+} = rhymeSearchSlice.actions;
 
 export default rhymeSearchSlice.reducer;

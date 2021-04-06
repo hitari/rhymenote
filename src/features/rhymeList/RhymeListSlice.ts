@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { getRhymeList } from '../../api/rhymeAPI';
-import { AppThunk } from '../../app/store';
+import { getRhymeList } from '@/api/rhymeAPI';
+import { AppThunk } from '@/app/store';
 
 interface List {
   no: number;
@@ -48,7 +48,6 @@ export const rhymeSearchSlice = createSlice({
     getListFailure: loadingFailed,
     getRhymeListSuccess(state, { payload }: PayloadAction<{ list: any[] }>) {
       const { list } = payload;
-      console.log('list???????', list, payload);
       state.list = list;
     },
   },
@@ -58,11 +57,12 @@ export const { getListStart, getListFailure, getRhymeListSuccess } = rhymeSearch
 
 export default rhymeSearchSlice.reducer;
 
-export const fetchRhymeList = (searchWords?: Word[]): AppThunk => async (dispatch) => {
+//export const fetchRhymeList = (searchWords?: Word[]): AppThunk => async (dispatch) => {
+export const fetchRhymeList = (searchWords?: any): AppThunk => async (dispatch) => {
+  console.log('fdsafdsfasfasd');
   try {
     dispatch(getListStart());
-    const list = await getRhymeList();
-    console.log('list', list);
+    const list = await getRhymeList(searchWords);
     dispatch(getRhymeListSuccess(list));
   } catch (err) {
     dispatch(getListFailure(err.toString()));
