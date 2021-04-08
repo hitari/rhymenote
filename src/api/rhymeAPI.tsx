@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { setSearchWords } from '@/features/rhymeSearch/RhymeSearchSlice';
+import api from '@/utils/urlHelper';
 
 interface Character {
   char?: string;
@@ -22,16 +22,11 @@ interface RhymeList {
   list: List[];
 }
 
-const URL = `http://172.19.63.231:4500`;
-
 // export async function getRhymeList(searchWords?: Word[]) {
 export async function getRhymeList(searchWords?: any) {
-  console.log('getRhymeList', searchWords);
-  const url = `${URL}/search/`;
+  const url = `${api.apiUrl}/search/`;
 
-  // const { data } = await axios.get<RhymeList>(url);
   const { data } = await axios.post<RhymeList>(url, {
-    a: 'aaaa',
     searchWords: searchWords,
   });
 
@@ -39,7 +34,7 @@ export async function getRhymeList(searchWords?: any) {
 }
 
 export async function getRhymeSearch() {
-  const url = `${URL}/search/`;
+  const url = `${api.apiUrl}/search/`;
 
   const { data } = await axios.get<RhymeList>(url);
   return data;
