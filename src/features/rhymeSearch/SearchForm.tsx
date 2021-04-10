@@ -9,7 +9,7 @@ import { wordconvert } from '@/utils/convertUtils';
 type InputEvent = ChangeEvent<HTMLInputElement>;
 type ChangeHandler = (e: InputEvent) => void;
 
-export function SearchForm() {
+const SearchForm = () => {
   const dispatch = useDispatch();
   const { searchWords, value, convertedValue } = useSelector((state: RootState) => state.rhymeSearch);
   const [searchInput, setSearchInput] = useState('');
@@ -321,4 +321,6 @@ export function SearchForm() {
       </form>
     </div>
   );
-}
+};
+
+export default SearchForm;

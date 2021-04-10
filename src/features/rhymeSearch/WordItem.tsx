@@ -20,7 +20,7 @@ interface Props {
   selectedWord: (id: number, charSelect: Word) => void;
 }
 
-export function WordItem({ id, char, selectedWord }: Props) {
+const WordItem = ({ id, char, selectedWord }: Props) => {
   const [isChoSung, setIsChoSung] = useState(false);
   const [isJungSung, setIsJungSung] = useState(false);
   const [isJongSung, setIsJongSung] = useState(false);
@@ -41,42 +41,55 @@ export function WordItem({ id, char, selectedWord }: Props) {
     );
   };
 
-  const onChoSungClicked = () => {
-    console.log('onChoSungClicked', id, cho);
-    setIsChoSung(!isChoSung);
-    changeWordStatus(id, { cho: { selected: !isChoSung } });
+  // 클릭 처리
+  const onClickButton = (id: number, type: string, isSelected: boolean, setSung: any) => {
+    setSung(!isSelected);
+    changeWordStatus(id, { [type]: { selected: !isSelected } });
   };
-  const onJungSungClicked = () => {
-    console.log('onJungSungClicked');
-    setIsJungSung(!isJungSung);
-    changeWordStatus(id, { jung: { selected: !isJungSung } });
-  };
-  const onjongSungClicked = () => {
-    console.log('onjongSungClicked');
-    setIsJongSung(!isJongSung);
-    changeWordStatus(id, { jong: { selected: !isJongSung } });
-  };
+
+  // Class Name 합쳐서 만들어준다.
+  const makeClassName = (name: any, isSelected: boolean) => className(name, { selected: isSelected });
 
   return (
     <div className="box_char">
-      <div className={className('box_cho', { selected: isChoSung })} onClick={onChoSungClicked}>
+      <div
+        className={makeClassName('box_cho', isChoSung)}
+        onClick={() => onClickButton(id, 'cho', isChoSung, setIsChoSung)}
+      >
         {cho}
       </div>
-      <div className={className('box_jung', { selected: isJungSung })} onClick={onJungSungClicked}>
+      <div
+        className={makeClassName('box_jung', isJungSung)}
+        onClick={() => onClickButton(id, 'jung', isJungSung, setIsJungSung)}
+      >
         {jung}
       </div>
-      <div className={className('box_jong', { selected: isJongSung })} onClick={onjongSungClicked}>
+      <div
+        className={makeClassName('box_jong', isJongSung)}
+        onClick={() => onClickButton(id, 'jong', isJongSung, setIsJongSung)}
+      >
         {jong}
       </div>
-      <div className={className('btn_cho', { selected: isChoSung })} onClick={onChoSungClicked}>
+      <div
+        className={makeClassName('btn_cho', isChoSung)}
+        onClick={() => onClickButton(id, 'cho', isChoSung, setIsChoSung)}
+      >
         초성
       </div>
-      <div className={className('btn_jung', { selected: isJungSung })} onClick={onJungSungClicked}>
+      <div
+        className={makeClassName('btn_jung', isJungSung)}
+        onClick={() => onClickButton(id, 'jung', isJungSung, setIsJungSung)}
+      >
         중성
       </div>
-      <div className={className('btn_jong', { selected: isJongSung })} onClick={onjongSungClicked}>
+      <div
+        className={makeClassName('btn_jong', isJongSung)}
+        onClick={() => onClickButton(id, 'jong', isJongSung, setIsJongSung)}
+      >
         종성
       </div>
     </div>
   );
-}
+};
+
+export default WordItem;

@@ -1,11 +1,11 @@
 import React, { Fragment, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/app/rootReducer';
-import { SearchForm } from './SearchForm';
-import { WordList } from './WordList';
+import SearchForm from './SearchForm';
+import WordList from './WordList';
 import img from '@/images/tit_rhymenote.png';
 
-export function RhymeSearchPage() {
+const RhymeSearchPage = () => {
   const { value } = useSelector((state: RootState) => state.rhymeSearch);
 
   return (
@@ -23,4 +23,6 @@ export function RhymeSearchPage() {
       </main>
     </Fragment>
   );
-}
+};
+
+export default RhymeSearchPage;

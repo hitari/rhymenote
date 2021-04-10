@@ -1,5 +1,5 @@
 import React from 'react';
-import { RhymeItem } from './RhymeItem';
+import RhymeItem from './RhymeItem';
 
 interface List {
   no: number;
@@ -11,7 +11,7 @@ interface Props {
   list: List[];
 }
 
-export function RhymeList({ list }: Props) {
+const RhymeList = ({ list }: Props) => {
   return (
     <article id="content">
       <h3 id="tabKo" className="tab_result_left selected">
@@ -39,4 +39,6 @@ export function RhymeList({ list }: Props) {
       </h3>
     </article>
   );
-}
+};
+
+export default RhymeList;

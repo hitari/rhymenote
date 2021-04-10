@@ -9,7 +9,7 @@ function createMarkup(mean: string) {
   return { __html: mean };
 }
 
-export function RhymeItem({ subject, mean }: Props) {
+const RhymeItem = ({ subject, mean }: Props) => {
   return (
     <li>
       <p className="txt_title">
@@ -20,4 +20,6 @@ export function RhymeItem({ subject, mean }: Props) {
       </div>
     </li>
   );
-}
+};
+
+export default RhymeItem;

@@ -843,6 +843,7 @@ body {
   width: 100px;
   height: 120px;
   border: 1px solid #000;
+  user-select: none;
   cursor: pointer;
   /* 검색 선택 버튼 */
 }

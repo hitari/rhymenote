@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
-import { RhymeList } from './RhymeList';
 import { RootState } from '@/app/rootReducer';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchRhymeList } from './RhymeListSlice';
+import RhymeList from './RhymeList';
 
-export function RhymeListPage() {
+const RhymeListPage = () => {
   const dispatch = useDispatch();
   const { list } = useSelector((state: RootState) => state.rhymeList);
 
@@ -17,4 +17,6 @@ export function RhymeListPage() {
       <RhymeList list={list} />
     </div>
   );
-}
+};
+
+export default RhymeListPage;
