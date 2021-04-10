@@ -25,6 +25,7 @@ export function WordList({ word }: Props) {
   const { value, convertedValue, searchWords } = useSelector((state: RootState) => state.rhymeSearch);
 
   const letters = StringToArray(word);
+  console.log('letters', letters);
 
   const selectedWord = (id: number, charSelect: Word) => {
     dispatch(setSearchChar({ id, charSelect }));

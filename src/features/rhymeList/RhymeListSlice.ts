@@ -59,7 +59,6 @@ export default rhymeSearchSlice.reducer;
 
 //export const fetchRhymeList = (searchWords?: Word[]): AppThunk => async (dispatch) => {
 export const fetchRhymeList = (searchWords?: any): AppThunk => async (dispatch) => {
-  console.log('fdsafdsfasfasd');
   try {
     dispatch(getListStart());
     const list = await getRhymeList(searchWords);

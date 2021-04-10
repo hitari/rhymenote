@@ -24,10 +24,12 @@ export function SearchForm() {
   const convertValue = (word: string) => {
     const letters = StringToArray(word);
 
-    const searchWords = letters.map((char, index) => {
+    console.log('prevSearchWords', prevSearchWords);
+    const sw = letters.map((char, index) => {
       if (char === searchInput.charAt(index)) {
         // 이전 검색 문자가 같으면 이전 값을 유지
-        return prevSearchWords[index];
+        console.log('searchWords--', char, searchInput.charAt(index), prevSearchWords[index]);
+        return searchWords[index];
       }
 
       // 새로운 결과값
@@ -47,9 +49,10 @@ export function SearchForm() {
         },
       };
     });
+    console.log('searchWords222', sw);
 
-    setPrevSearchWords(searchWords);
-    dispatch(setSearchWords({ searchWords }));
+    setPrevSearchWords(sw);
+    dispatch(setSearchWords({ searchWords: sw }));
   };
 
   const onSearchInputChanged: ChangeHandler = (e: InputEvent) => {
@@ -254,7 +257,6 @@ export function SearchForm() {
     const changedWord = verificationData.map(
       (item: { name: string; enCollection: string[]; krCollection: string[] }) => {
         const syllable = word[item.name];
-        console.log('syllable', syllable);
         // 선택이 안되거나 값이 없을경우 빈값 처리
         if (!syllable.selected || !syllable.char) return '\\w';
         // -1 일때 입력받은 char을 리턴 한다.
@@ -273,19 +275,16 @@ export function SearchForm() {
   };
 
   const onMoumClicked = () => {
-    console.log('searchWords', searchWords);
     dispatch(setMoumWords({ searchWords }));
   };
 
   const onSearchClicked = () => {
-    console.log('onClicked', value, convertedValue, searchWords);
     if (!value) {
       alert('빈값은 조회가 되지 않습니다.');
       return;
     }
 
     const l = syllableConversion(searchWords);
-    console.log(l, l.join('/'));
 
     dispatch(fetchRhymeList(l.join('/')));
   };
