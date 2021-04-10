@@ -50,44 +50,27 @@ const WordItem = ({ id, char, selectedWord }: Props) => {
   // Class Name 합쳐서 만들어준다.
   const makeClassName = (name: any, isSelected: boolean) => className(name, { selected: isSelected });
 
+  // 상태 값 리스트
+  const items = [
+    { title: cho, name: 'cho', className: 'box_cho', isSung: isChoSung, setSung: setIsChoSung },
+    { title: jung, name: 'jung', className: 'box_jung', isSung: isJungSung, setSung: setIsJungSung },
+    { title: jong, name: 'jong', className: 'box_jong', isSung: isJongSung, setSung: setIsJongSung },
+    { title: '초성', name: 'cho', className: 'btn_cho', isSung: isChoSung, setSung: setIsChoSung },
+    { title: '중성', name: 'jung', className: 'btn_jung', isSung: isJungSung, setSung: setIsJungSung },
+    { title: '종성', name: 'jong', className: 'btn_jong', isSung: isJongSung, setSung: setIsJongSung },
+  ];
+
   return (
     <div className="box_char">
-      <div
-        className={makeClassName('box_cho', isChoSung)}
-        onClick={() => onClickButton(id, 'cho', isChoSung, setIsChoSung)}
-      >
-        {cho}
-      </div>
-      <div
-        className={makeClassName('box_jung', isJungSung)}
-        onClick={() => onClickButton(id, 'jung', isJungSung, setIsJungSung)}
-      >
-        {jung}
-      </div>
-      <div
-        className={makeClassName('box_jong', isJongSung)}
-        onClick={() => onClickButton(id, 'jong', isJongSung, setIsJongSung)}
-      >
-        {jong}
-      </div>
-      <div
-        className={makeClassName('btn_cho', isChoSung)}
-        onClick={() => onClickButton(id, 'cho', isChoSung, setIsChoSung)}
-      >
-        초성
-      </div>
-      <div
-        className={makeClassName('btn_jung', isJungSung)}
-        onClick={() => onClickButton(id, 'jung', isJungSung, setIsJungSung)}
-      >
-        중성
-      </div>
-      <div
-        className={makeClassName('btn_jong', isJongSung)}
-        onClick={() => onClickButton(id, 'jong', isJongSung, setIsJongSung)}
-      >
-        종성
-      </div>
+      {items.map(({ title, name, className, isSung, setSung }) => (
+        <div
+          key={className}
+          className={makeClassName(className, isSung)}
+          onClick={() => onClickButton(id, name, isSung, setSung)}
+        >
+          {title}
+        </div>
+      ))}
     </div>
   );
 };
