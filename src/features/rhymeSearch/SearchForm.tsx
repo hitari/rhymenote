@@ -284,9 +284,7 @@ const SearchForm = () => {
       return;
     }
 
-    const l = syllableConversion(searchWords);
-
-    dispatch(fetchRhymeList(l.join('/')));
+    dispatch(fetchRhymeList(syllableConversion(searchWords).join('/')));
   };
 
   return (

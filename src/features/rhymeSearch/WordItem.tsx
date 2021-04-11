@@ -51,7 +51,7 @@ const WordItem = ({ id, char, selectedWord }: Props) => {
   const makeClassName = (name: any, isSelected: boolean) => className(name, { selected: isSelected });
 
   // 상태 값 리스트
-  const items = [
+  const sungData = [
     { title: cho, name: 'cho', className: 'box_cho', isSung: isChoSung, setSung: setIsChoSung },
     { title: jung, name: 'jung', className: 'box_jung', isSung: isJungSung, setSung: setIsJungSung },
     { title: jong, name: 'jong', className: 'box_jong', isSung: isJongSung, setSung: setIsJongSung },
@@ -62,7 +62,7 @@ const WordItem = ({ id, char, selectedWord }: Props) => {
 
   return (
     <div className="box_char">
-      {items.map(({ title, name, className, isSung, setSung }) => (
+      {sungData.map(({ title, name, className, isSung, setSung }) => (
         <div
           key={className}
           className={makeClassName(className, isSung)}
