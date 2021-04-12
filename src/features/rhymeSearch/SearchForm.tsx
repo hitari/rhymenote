@@ -24,16 +24,15 @@ const SearchForm = () => {
   const convertValue = (word: string) => {
     const letters = StringToArray(word);
 
-    console.log('prevSearchWords', prevSearchWords);
     const sw = letters.map((char, index) => {
       if (char === searchInput.charAt(index)) {
         // 이전 검색 문자가 같으면 이전 값을 유지
-        console.log('searchWords--', char, searchInput.charAt(index), prevSearchWords[index]);
         return searchWords[index];
       }
 
       // 새로운 결과값
       const [cho, jung, jong] = wordconvert(char);
+
       return {
         cho: {
           char: cho,
@@ -49,7 +48,6 @@ const SearchForm = () => {
         },
       };
     });
-    console.log('searchWords222', sw);
 
     setPrevSearchWords(sw);
     dispatch(setSearchWords({ searchWords: sw }));
