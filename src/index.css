@@ -491,7 +491,7 @@ a:active {
 body {
   font-size: 12px;
   line-height: 1.2;
-  font-family: Dotum, '돋움', Helvetica, AppleSDGothicNeo, sans-serif;
+  font-family: 'Noto Sans KR', Dotum, '돋움', Helvetica, AppleSDGothicNeo, sans-serif;
   background-color: #fff;
   color: #000;
 }
