@@ -1,6 +1,7 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { getRhymeList } from '@/api/rhymeAPI';
 import { AppThunk } from '@/app/store';
+import { AxiosError } from 'axios';
 
 interface List {
   no: number;
@@ -10,8 +11,8 @@ interface List {
 
 interface RhymeList {
   list: List[];
-  isLoading: boolean;
-  error: string | null;
+  loading: string;
+  error: string | null | undefined;
 }
 
 interface Character {
@@ -25,45 +26,79 @@ interface Word {
   jong: Character;
 }
 
+interface ValidationErrors {
+  errorMessage: string;
+  field_errors: Record<string, string>;
+}
+
 const initialState: RhymeList = {
   list: [],
-  isLoading: false,
+  loading: 'idle',
   error: null,
 };
 
-function startLoading(state: RhymeList) {
-  state.isLoading = true;
-}
-
-function loadingFailed(state: RhymeList, action: PayloadAction<string>) {
-  state.isLoading = false;
-  state.error = action.payload;
-}
+export const fetchRhymeList = createAsyncThunk(
+  'rhymeSearch/fetchRhymeList',
+  async (searchWords: { searchWords?: Word[] }, thunkAPI) => {
+    try {
+      console.log(searchWords);
+      const response = await getRhymeList(searchWords);
+      return response;
+    } catch (err) {
+      const error: AxiosError<ValidationErrors> = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
 
 export const rhymeSearchSlice = createSlice({
   name: 'rhymeSearch',
   initialState,
   reducers: {
-    getListStart: startLoading,
-    getListFailure: loadingFailed,
     getRhymeListSuccess(state, { payload }: PayloadAction<{ list: any[] }>) {
       const { list } = payload;
       state.list = list;
     },
   },
+  extraReducers: (builder) => {
+    builder.addCase(fetchRhymeList.pending, (state, action) => {
+      if (state.loading === 'idle') {
+        state.loading = 'pending';
+      }
+    });
+
+    builder.addCase(fetchRhymeList.fulfilled, (state, { payload }: PayloadAction<{ list: any[] }>) => {
+      const { list } = payload;
+      state.loading = 'idle';
+      state.list = list;
+    });
+
+    builder.addCase(fetchRhymeList.rejected, (state, action: any) => {
+      state.loading = 'idle';
+      if (action.payload) {
+        // Being that we passed in ValidationErrors to rejectType in `createAsyncThunk`, the payload will be available here.
+        state.error = action.payload.errorMessage;
+      } else {
+        state.error = action.error.message;
+      }
+    });
+  },
 });
 
-export const { getListStart, getListFailure, getRhymeListSuccess } = rhymeSearchSlice.actions;
+export const { getRhymeListSuccess } = rhymeSearchSlice.actions;
 
 export default rhymeSearchSlice.reducer;
 
-//export const fetchRhymeList = (searchWords?: Word[]): AppThunk => async (dispatch) => {
-export const fetchRhymeList = (searchWords?: any): AppThunk => async (dispatch) => {
-  try {
-    dispatch(getListStart());
-    const list = await getRhymeList(searchWords);
-    dispatch(getRhymeListSuccess(list));
-  } catch (err) {
-    dispatch(getListFailure(err.toString()));
-  }
-};
+// export const fetchRhymeList = (searchWords?: any): AppThunk => async (dispatch) => {
+//   try {
+//     dispatch(getListStart());
+//     const list = await getRhymeList(searchWords);
+//     dispatch(getRhymeListSuccess(list));
+//   } catch (err) {
+//     dispatch(getListFailure(err.toString()));
+//   }
+// };

@@ -9,7 +9,7 @@ const RhymeListPage = () => {
   const { list } = useSelector((state: RootState) => state.rhymeList);
 
   useEffect(() => {
-    dispatch(fetchRhymeList());
+    dispatch(fetchRhymeList({}));
   }, []);
 
   return (
