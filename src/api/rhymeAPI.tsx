@@ -39,3 +39,17 @@ export async function getRhymeSearch() {
   const { data } = await axios.get<RhymeList>(url);
   return data;
 }
+
+export async function getKoSearch(page: number, content: string) {
+  const url = `${api.apiUrl}/search/ko/`;
+  const config = {
+    url,
+    params: {
+      page,
+      content,
+    },
+  };
+
+  const { data } = await axios(config);
+  return data;
+}
