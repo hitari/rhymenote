@@ -1,5 +1,5 @@
 // Node Server Url
-const API = 'http://172.27.223.248:4500';
+const API = 'http://172.19.92.140:4500';
 
 export default {
   get apiUrl() {

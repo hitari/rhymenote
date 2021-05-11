@@ -77,7 +77,27 @@ export const fetchKoSearch = createAsyncThunk(
     try {
       const { page, content } = payload;
       console.log('rhymeSearch/fetchKoSearch', payload);
-      const response = await getKoSearch(page, content);
+      const response = await getKoSearch(content, page);
+      return response;
+    } catch (err) {
+      const error: AxiosError<ValidationErrors> = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// 한글 사전 검색
+export const fetchKoSearchMore = createAsyncThunk(
+  'rhymeSearch/fetchKoSearchMore',
+  async (payload: { page: number; content: string }, thunkAPI) => {
+    try {
+      const { page, content } = payload;
+      console.log('rhymeSearch/fetchKoSearchMore', payload);
+      const response = await getKoSearch(content, page);
       return response;
     } catch (err) {
       const error: AxiosError<ValidationErrors> = err; // cast the error for access
@@ -120,6 +140,36 @@ export const rhymeSearchSlice = createSlice({
       state.hasNextPage = hasNextPage;
     });
 
+    // fetchKoSearch
+    builder.addCase(fetchKoSearchMore.pending, (state, action) => {
+      if (state.loading === 'idle') {
+        state.loading = 'pending';
+      }
+    });
+
+    builder.addCase(fetchKoSearchMore.fulfilled, (state, { payload }: PayloadAction<RhymeList>) => {
+      const { list, docs, totalDocs, page, totalPages, pagingCounter, hasPrevPage, hasNextPage } = payload;
+      state.loading = 'idle';
+      state.list = [...state.list, ...list];
+      state.docs = [...state.docs, ...docs];
+      state.totalDocs = totalDocs;
+      state.page = page;
+      state.totalPages = totalPages;
+      state.pagingCounter = pagingCounter;
+      state.hasPrevPage = hasPrevPage;
+      state.hasNextPage = hasNextPage;
+    });
+
+    builder.addCase(fetchKoSearchMore.rejected, (state, action: any) => {
+      state.loading = 'idle';
+      if (action.payload) {
+        // Being that we passed in ValidationErrors to rejectType in `createAsyncThunk`, the payload will be available here.
+        state.error = action.payload.errorMessage;
+      } else {
+        state.error = action.error.message;
+      }
+    });
+
     builder.addCase(fetchKoSearch.rejected, (state, action: any) => {
       state.loading = 'idle';
       if (action.payload) {
@@ -137,10 +187,17 @@ export const rhymeSearchSlice = createSlice({
       }
     });
 
-    builder.addCase(fetchRhymeList.fulfilled, (state, { payload }: PayloadAction<{ list: any[] }>) => {
-      const { list } = payload;
+    builder.addCase(fetchRhymeList.fulfilled, (state, { payload }: PayloadAction<RhymeList>) => {
+      const { list, docs, totalDocs, page, totalPages, pagingCounter, hasPrevPage, hasNextPage } = payload;
       state.loading = 'idle';
       state.list = list;
+      state.docs = docs;
+      state.totalDocs = totalDocs;
+      state.page = page;
+      state.totalPages = totalPages;
+      state.pagingCounter = pagingCounter;
+      state.hasPrevPage = hasPrevPage;
+      state.hasNextPage = hasNextPage;
     });
 
     builder.addCase(fetchRhymeList.rejected, (state, action: any) => {

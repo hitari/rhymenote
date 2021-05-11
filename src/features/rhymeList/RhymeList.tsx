@@ -2,8 +2,9 @@ import React, { useCallback, useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/app/rootReducer';
 import RhymeItem from './RhymeItem';
-import { fetchKoSearch } from './RhymeListSlice';
+import { fetchKoSearchMore } from './RhymeListSlice';
 import { syllableConversion } from '@/utils/convertUtils';
+import { useInfinteScroll } from '@/hooks/useInfinteScroll';
 
 interface List {
   no: number;
@@ -13,37 +14,54 @@ interface List {
 
 interface Props {
   list: List[];
+  isTab: boolean;
 }
 
-const RhymeList = ({ list }: Props) => {
+const RhymeList = ({ list, isTab }: Props) => {
   const dispatch = useDispatch();
   const [target, setTarget] = useState<HTMLDivElement | null | undefined>(null);
   const { searchWords, value } = useSelector((state: RootState) => state.rhymeSearch);
+  const { page, hasPrevPage, hasNextPage } = useSelector((state: RootState) => state.rhymeList);
 
-  const onIntersect: IntersectionObserverCallback = (entries, observer) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        // observer.unobserve(entry.target);
-        console.log('Last LI', searchWords);
+  console.log('RhymeList');
+
+  useInfinteScroll({
+    target,
+    onIntersect: ([{ isIntersecting }]) => {
+      if (isIntersecting && isTab) {
+        if (!hasNextPage) return;
+        console.log('Last LI', page, searchWords);
         const content = syllableConversion(searchWords).join('/');
-        dispatch(fetchKoSearch({ page: 2, content }));
+        dispatch(fetchKoSearchMore({ page: page + 1, content }));
       }
-    });
-  };
+    },
+  });
 
-  useEffect(() => {
-    let observer: IntersectionObserver;
-    if (target) {
-      console.log(target);
-      observer = new IntersectionObserver(onIntersect);
-      observer.observe(target);
-    }
+  // const onIntersect: IntersectionObserverCallback = (entries, observer) => {
+  //   entries.forEach((entry) => {
+  //     if (entry.isIntersecting) {
+  //       if (!hasNextPage) return console.log('?????');
+  //       // observer.unobserve(entry.target);
+  //       console.log('Last LI', page, searchWords);
+  //       const content = syllableConversion(searchWords).join('/');
+  //       dispatch(fetchKoSearch({ page: page + 1, content }));
+  //     }
+  //   });
+  // };
 
-    return () => {
-      console.log('end');
-      observer && observer.disconnect();
-    };
-  }, [target, searchWords]);
+  // useEffect(() => {
+  //   let observer: IntersectionObserver;
+  //   if (target) {
+  //     console.log(target);
+  //     observer = new IntersectionObserver(onIntersect);
+  //     observer.observe(target);
+  //   }
+
+  //   return () => {
+  //     console.log('end');
+  //     observer && observer.disconnect();
+  //   };
+  // }, [target, page, searchWords]);
 
   return (
     <>

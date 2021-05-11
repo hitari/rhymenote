@@ -37,11 +37,11 @@ const RhymeListPage = () => {
         </a>
       </div>
       <section className={classnames('box_result', { selected: tab === 'ko' })}>
-        <RhymeList list={list} />
+        <RhymeList list={list} isTab={tab === 'ko'} />
       </section>
-      <section className={classnames('box_result', { selected: tab === 'en' })}>
-        <RhymeList list={list} />
-      </section>
+      {/* <section className={classnames('box_result', { selected: tab === 'en' })}>
+        <RhymeList list={list} isTab={tab === 'en'} />
+      </section> */}
     </article>
   );
 };

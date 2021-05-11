@@ -23,13 +23,15 @@ interface RhymeList {
 }
 
 // export async function getRhymeList(searchWords?: Word[]) {
-export async function getRhymeList(searchWords?: any) {
-  const url = `${api.apiUrl}/search/`;
+export async function getRhymeList(searchWords?: any, page = 1) {
+  const config = {
+    data: {
+      page,
+      content: searchWords,
+    },
+  };
 
-  const { data } = await axios.post<RhymeList>(url, {
-    searchWords: searchWords,
-  });
-
+  const { data } = await axios.post(`${api.apiUrl}/search/`, config);
   return data;
 }
 
@@ -40,16 +42,14 @@ export async function getRhymeSearch() {
   return data;
 }
 
-export async function getKoSearch(page: number, content: string) {
-  const url = `${api.apiUrl}/search/ko/`;
+export async function getKoSearch(content: string, page: number) {
   const config = {
-    url,
     params: {
       page,
       content,
     },
   };
 
-  const { data } = await axios(config);
+  const { data } = await axios.get(`${api.apiUrl}/search/ko/`, config);
   return data;
 }
