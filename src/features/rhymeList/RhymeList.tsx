@@ -21,47 +21,46 @@ const RhymeList = ({ list, isTab }: Props) => {
   const dispatch = useDispatch();
   const [target, setTarget] = useState<HTMLDivElement | null | undefined>(null);
   const { searchWords, value } = useSelector((state: RootState) => state.rhymeSearch);
-  const { page, hasPrevPage, hasNextPage } = useSelector((state: RootState) => state.rhymeList);
+  const { page, hasPrevPage, hasNextPage, loading } = useSelector((state: RootState) => state.rhymeList);
 
   console.log('RhymeList');
 
-  useInfinteScroll({
-    target,
-    onIntersect: ([{ isIntersecting }]) => {
-      if (isIntersecting && isTab) {
-        if (!hasNextPage) return;
+  // useInfinteScroll({
+  //   target,
+  //   onIntersect: ([{ isIntersecting, target }], observer) => {
+  //     if (isIntersecting && isTab) {
+  //       if (!hasNextPage) return;
+  //       // console.log('Last LI', page, searchWords);
+  //       const content = syllableConversion(searchWords).join('/');
+  //       dispatch(fetchKoSearchMore({ page: page + 1, content }));
+  //     }
+  //   },
+  // });
+
+  const onIntersect: IntersectionObserverCallback = (entries, observer) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        if (!hasNextPage) return console.log('?????');
+        // observer.unobserve(entry.target);
         console.log('Last LI', page, searchWords);
         const content = syllableConversion(searchWords).join('/');
         dispatch(fetchKoSearchMore({ page: page + 1, content }));
       }
-    },
-  });
+    });
+  };
 
-  // const onIntersect: IntersectionObserverCallback = (entries, observer) => {
-  //   entries.forEach((entry) => {
-  //     if (entry.isIntersecting) {
-  //       if (!hasNextPage) return console.log('?????');
-  //       // observer.unobserve(entry.target);
-  //       console.log('Last LI', page, searchWords);
-  //       const content = syllableConversion(searchWords).join('/');
-  //       dispatch(fetchKoSearch({ page: page + 1, content }));
-  //     }
-  //   });
-  // };
-
-  // useEffect(() => {
-  //   let observer: IntersectionObserver;
-  //   if (target) {
-  //     console.log(target);
-  //     observer = new IntersectionObserver(onIntersect);
-  //     observer.observe(target);
-  //   }
-
-  //   return () => {
-  //     console.log('end');
-  //     observer && observer.disconnect();
-  //   };
-  // }, [target, page, searchWords]);
+  useEffect(() => {
+    let observer: IntersectionObserver;
+    if (target) {
+      console.log(target);
+      observer = new IntersectionObserver(onIntersect);
+      observer.observe(target);
+    }
+    return () => {
+      console.log('end');
+      observer && observer.disconnect();
+    };
+  }, [target, page, searchWords, list]);
 
   return (
     <>
@@ -69,6 +68,7 @@ const RhymeList = ({ list, isTab }: Props) => {
         {list.map((item) => (
           <RhymeItem key={item.no} subject={item.subject} mean={item.mean} />
         ))}
+        {!hasNextPage && <li style={{ textAlign: 'center', borderBottom: 0 }}>결과가 더 이상 존재 하지 않습니다.</li>}
       </ul>
       <div ref={setTarget} style={{ height: '10px' }}></div>
     </>
@@ -76,7 +76,6 @@ const RhymeList = ({ list, isTab }: Props) => {
 };
 
 export default RhymeList;
-
 {
   /* <p className="box_paging">
 <strong className="num_selected">1</strong>

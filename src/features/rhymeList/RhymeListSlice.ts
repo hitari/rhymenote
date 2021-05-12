@@ -19,6 +19,7 @@ interface RhymeList {
   hasPrevPage: boolean;
   hasNextPage: boolean;
   loading: string;
+  currentRequestId: any;
   error: string | null | undefined;
 }
 
@@ -48,15 +49,20 @@ const initialState: RhymeList = {
   hasPrevPage: false,
   hasNextPage: false,
   loading: 'idle',
+  currentRequestId: undefined,
   error: null,
 };
 
 // 전체 검색
 export const fetchRhymeList = createAsyncThunk(
-  'rhymeSearch/fetchRhymeList',
-  async (searchWords: { searchWords?: Word[] }, thunkAPI) => {
+  'rhymeList/fetchRhymeList',
+  async (searchWords: { searchWords?: Word[] }, thunkAPI: any) => {
     try {
-      console.log(searchWords);
+      const { currentRequestId, loading } = thunkAPI.getState().rhymeList;
+      if (loading !== 'pending' || thunkAPI.requestId !== currentRequestId) {
+        return;
+      }
+
       const response = await getRhymeList(searchWords);
       return response;
     } catch (err) {
@@ -72,11 +78,16 @@ export const fetchRhymeList = createAsyncThunk(
 
 // 한글 사전 검색
 export const fetchKoSearch = createAsyncThunk(
-  'rhymeSearch/fetchKoSearch',
-  async (payload: { page: number; content: string }, thunkAPI) => {
+  'rhymeList/fetchKoSearch',
+  async (payload: { page: number; content: string }, thunkAPI: any) => {
     try {
       const { page, content } = payload;
-      console.log('rhymeSearch/fetchKoSearch', payload);
+      const { currentRequestId, loading } = thunkAPI.getState().rhymeList;
+      if (loading !== 'pending' || thunkAPI.requestId !== currentRequestId) {
+        return;
+      }
+
+      console.log('rhymeList/fetchKoSearch', payload);
       const response = await getKoSearch(content, page);
       return response;
     } catch (err) {
@@ -92,11 +103,15 @@ export const fetchKoSearch = createAsyncThunk(
 
 // 한글 사전 검색
 export const fetchKoSearchMore = createAsyncThunk(
-  'rhymeSearch/fetchKoSearchMore',
-  async (payload: { page: number; content: string }, thunkAPI) => {
+  'rhymeList/fetchKoSearchMore',
+  async (payload: { page: number; content: string }, thunkAPI: any) => {
     try {
       const { page, content } = payload;
-      console.log('rhymeSearch/fetchKoSearchMore', payload);
+      const { currentRequestId, loading } = thunkAPI.getState().rhymeList;
+      if (loading !== 'pending' || thunkAPI.requestId !== currentRequestId) {
+        return;
+      }
+
       const response = await getKoSearch(content, page);
       return response;
     } catch (err) {
@@ -110,8 +125,8 @@ export const fetchKoSearchMore = createAsyncThunk(
   }
 );
 
-export const rhymeSearchSlice = createSlice({
-  name: 'rhymeSearch',
+export const rhymeListSlice = createSlice({
+  name: 'rhymeList',
   initialState,
   reducers: {
     getRhymeListSuccess(state, { payload }: PayloadAction<{ list: any[] }>) {
@@ -120,10 +135,11 @@ export const rhymeSearchSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // fetchKoSearch
+    // fetchKoSearchMore
     builder.addCase(fetchKoSearch.pending, (state, action) => {
       if (state.loading === 'idle') {
         state.loading = 'pending';
+        state.currentRequestId = action.meta.requestId;
       }
     });
 
@@ -144,6 +160,7 @@ export const rhymeSearchSlice = createSlice({
     builder.addCase(fetchKoSearchMore.pending, (state, action) => {
       if (state.loading === 'idle') {
         state.loading = 'pending';
+        state.currentRequestId = action.meta.requestId;
       }
     });
 
@@ -184,6 +201,7 @@ export const rhymeSearchSlice = createSlice({
     builder.addCase(fetchRhymeList.pending, (state, action) => {
       if (state.loading === 'idle') {
         state.loading = 'pending';
+        state.currentRequestId = action.meta.requestId;
       }
     });
 
@@ -212,9 +230,9 @@ export const rhymeSearchSlice = createSlice({
   },
 });
 
-export const { getRhymeListSuccess } = rhymeSearchSlice.actions;
+export const { getRhymeListSuccess } = rhymeListSlice.actions;
 
-export default rhymeSearchSlice.reducer;
+export default rhymeListSlice.reducer;
 
 // export const fetchRhymeList = (searchWords?: any): AppThunk => async (dispatch) => {
 //   try {

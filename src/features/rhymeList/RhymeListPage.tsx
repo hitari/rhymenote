@@ -13,7 +13,7 @@ const RhymeListPage = () => {
   const enCount = 0;
 
   const onclickTab = useCallback((e) => setTab(e.currentTarget.dataset.id), [tab]);
-
+  console.log('-----------');
   useEffect(() => {
     dispatch(fetchRhymeList({}));
   }, []);
