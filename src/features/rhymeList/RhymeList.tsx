@@ -2,7 +2,6 @@ import React, { useCallback, useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/app/rootReducer';
 import RhymeItem from './RhymeItem';
-import { fetchKoSearchMore } from './RhymeListSlice';
 import { syllableConversion } from '@/utils/convertUtils';
 import { useInfinteScroll } from '@/hooks/useInfinteScroll';
 
@@ -14,14 +13,22 @@ interface List {
 
 interface Props {
   list: List[];
+  fetchSearchMore: AsyncThunk<
+    any,
+    {
+      page: number;
+      content: string;
+    }
+  >;
+  useDictionarySelector: useDictionarySelector;
   isTab: boolean;
 }
 
-const RhymeList = ({ list, isTab }: Props) => {
+const RhymeList = ({ list, fetchSearchMore, useDictionarySelector, isTab }: Props) => {
   const dispatch = useDispatch();
   const [target, setTarget] = useState<HTMLDivElement | null | undefined>(null);
   const { searchWords, value } = useSelector((state: RootState) => state.rhymeSearch);
-  const { page, hasPrevPage, hasNextPage, loading } = useSelector((state: RootState) => state.rhymeList);
+  const { page, hasPrevPage, hasNextPage, loading } = useDictionarySelector;
 
   console.log('RhymeList');
 
@@ -44,7 +51,7 @@ const RhymeList = ({ list, isTab }: Props) => {
         // observer.unobserve(entry.target);
         console.log('Last LI', page, searchWords);
         const content = syllableConversion(searchWords).join('/');
-        dispatch(fetchKoSearchMore({ page: page + 1, content }));
+        dispatch(fetchSearchMore({ page: page + 1, content }));
       }
     });
   };

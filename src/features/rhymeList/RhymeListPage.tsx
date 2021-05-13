@@ -2,12 +2,13 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { RootState } from '@/app/rootReducer';
 import { useSelector, useDispatch } from 'react-redux';
 import classnames from 'classnames';
+import { fetchKoSearchMore } from './RhymeListSlice';
 import { fetchRhymeList } from './RhymeListSlice';
 import RhymeList from './RhymeList';
 
 const RhymeListPage = () => {
   const dispatch = useDispatch();
-  const { list } = useSelector((state: RootState) => state.rhymeList);
+  const { koDictionary, enDictionary } = useSelector((state: RootState) => state.rhymeList);
   const [tab, setTab] = useState('ko');
   const koCount = 0;
   const enCount = 0;
@@ -37,11 +38,21 @@ const RhymeListPage = () => {
         </a>
       </div>
       <section className={classnames('box_result', { selected: tab === 'ko' })}>
-        <RhymeList list={list} isTab={tab === 'ko'} />
+        <RhymeList
+          list={koDictionary.list}
+          fetchSearchMore={fetchKoSearchMore}
+          useDictionarySelector={koDictionary}
+          isTab={tab === 'ko'}
+        />
       </section>
-      {/* <section className={classnames('box_result', { selected: tab === 'en' })}>
-        <RhymeList list={list} isTab={tab === 'en'} />
-      </section> */}
+      <section className={classnames('box_result', { selected: tab === 'en' })}>
+        <RhymeList
+          list={enDictionary.list}
+          fetchSearchMore={fetchKoSearchMore}
+          useDictionarySelector={koDictionary}
+          isTab={tab === 'en'}
+        />
+      </section>
     </article>
   );
 };

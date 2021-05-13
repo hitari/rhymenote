@@ -53,3 +53,15 @@ export async function getKoSearch(content: string, page: number) {
   const { data } = await axios.get(`${api.apiUrl}/search/ko/`, config);
   return data;
 }
+
+export async function getEnSearch(content: string, page: number) {
+  const config = {
+    params: {
+      page,
+      content,
+    },
+  };
+
+  const { data } = await axios.get(`${api.apiUrl}/search/en/`, config);
+  return data;
+}
