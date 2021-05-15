@@ -537,6 +537,16 @@ body {
   background: url(./images/bg_rhymenote.png);
   text-align: center;
 }
+#wrapSearch.sticky .inner_box {
+  width: 100%;
+  position: fixed;
+  /* top: -124px; */
+  top: -137px;
+  z-index: 99;
+}
+#wrapSearch.sticky .box_search .box_set {
+  display: none;
+}
 .box_head {
   width: 100%;
   min-height: 127px;
@@ -802,11 +812,14 @@ body {
 }
 /* Mobile Device - 사용자 해상도가 767px 이하일 때 */
 @media screen and (max-width: 767px) {
+  #content ul {
+    font-size: 13px;
+  }
   .tit_rhymenote img {
     width: 300px;
   }
   .box_search {
-    width: 90%;
+    width: 100%;
   }
   .box_search .tf_search {
     left: 0;

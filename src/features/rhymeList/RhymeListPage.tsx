@@ -10,8 +10,6 @@ const RhymeListPage = () => {
   const dispatch = useDispatch();
   const { koDictionary, enDictionary } = useSelector((state: RootState) => state.rhymeList);
   const [tab, setTab] = useState('ko');
-  const koCount = 0;
-  const enCount = 0;
 
   const onclickTab = useCallback((e) => setTab(e.currentTarget.dataset.id), [tab]);
   console.log('-----------');
@@ -25,7 +23,7 @@ const RhymeListPage = () => {
         <a href="#" className="tit_tab" data-id="ko" onClick={onclickTab}>
           한글
           <span className="num_result" title="전체단어수">
-            ({koCount})
+            ({koDictionary.totalDocs})
           </span>
         </a>
       </div>
@@ -33,7 +31,7 @@ const RhymeListPage = () => {
         <a href="#" className="tit_tab" data-id="en" onClick={onclickTab}>
           영어
           <span className="num_result" title="전체단어수">
-            ({enCount})
+            ({enDictionary.totalDocs})
           </span>
         </a>
       </div>

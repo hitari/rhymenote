@@ -12,13 +12,15 @@ const RhymeSearchPage = () => {
     <Fragment>
       <main id="main">
         <div id="wrapSearch">
-          <div className="box_head">
-            <h1 id="titRhymenote" className="tit_rhymenote">
+          <div className="inner_box">
+            <div className="box_head">
+              {/* <h1 id="titRhymenote" className="tit_rhymenote">
               <img src={img} width="500" height="122" alt="Rhymenote" />
-            </h1>
-            <WordList word={value} />
+            </h1> */}
+              <WordList word={value} />
+            </div>
+            <SearchForm />
           </div>
-          <SearchForm />
         </div>
       </main>
     </Fragment>

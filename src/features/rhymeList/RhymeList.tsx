@@ -2,6 +2,7 @@ import React, { useCallback, useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/app/rootReducer';
 import RhymeItem from './RhymeItem';
+import AlphabetScroll from '@/components/alphabetScroll';
 import { syllableConversion } from '@/utils/convertUtils';
 import { useInfinteScroll } from '@/hooks/useInfinteScroll';
 
@@ -13,14 +14,16 @@ interface List {
 
 interface Props {
   list: List[];
-  fetchSearchMore: AsyncThunk<
-    any,
-    {
-      page: number;
-      content: string;
-    }
-  >;
-  useDictionarySelector: useDictionarySelector;
+  fetchSearchMore: any;
+  useDictionarySelector: any;
+  // fetchSearchMore: AsyncThunk<
+  //   any,
+  //   {
+  //     page: number;
+  //     content: string;
+  //   }
+  // >;
+  // useDictionarySelector: useDictionarySelector;
   isTab: boolean;
 }
 
@@ -31,6 +34,32 @@ const RhymeList = ({ list, fetchSearchMore, useDictionarySelector, isTab }: Prop
   const { page, hasPrevPage, hasNextPage, loading } = useDictionarySelector;
 
   console.log('RhymeList');
+
+  const koAlphabet = [
+    'ㄱ',
+    'ㄲ',
+    'ㄴ',
+    'ㄷ',
+    'ㄸ',
+    'ㄹ',
+    'ㅁ',
+    'ㅂ',
+    'ㅃ',
+    'ㅅ',
+    'ㅆ',
+    'ㅇ',
+    'ㅈ',
+    'ㅉ',
+    'ㅊ',
+    'ㅋ',
+    'ㅌ',
+    'ㅍ',
+    'ㅎ',
+  ];
+  const enAlphabet = Array(29)
+    .fill('')
+    .map((v, i) => String.fromCharCode(65 + i));
+  12593;
 
   // useInfinteScroll({
   //   target,
@@ -44,12 +73,12 @@ const RhymeList = ({ list, fetchSearchMore, useDictionarySelector, isTab }: Prop
   //   },
   // });
 
+  // infinity scroll
   const onIntersect: IntersectionObserverCallback = (entries, observer) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
-        if (!hasNextPage) return console.log('?????');
+        if (!hasNextPage) return;
         // observer.unobserve(entry.target);
-        console.log('Last LI', page, searchWords);
         const content = syllableConversion(searchWords).join('/');
         dispatch(fetchSearchMore({ page: page + 1, content }));
       }
@@ -59,18 +88,45 @@ const RhymeList = ({ list, fetchSearchMore, useDictionarySelector, isTab }: Prop
   useEffect(() => {
     let observer: IntersectionObserver;
     if (target) {
-      console.log(target);
       observer = new IntersectionObserver(onIntersect);
       observer.observe(target);
     }
     return () => {
-      console.log('end');
       observer && observer.disconnect();
     };
   }, [target, page, searchWords, list]);
 
+  // sticky
+  useEffect(() => {
+    // state 와 dispatch 이용해서 컴포넌트로 구성 변경
+    const $tab = document.querySelector('.tab_result_left') || document.createElement('div');
+    const $wrapSearch = document.querySelector('#wrapSearch');
+    const observer = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((entry) => {
+          if (isTab && !entry.isIntersecting) {
+            // observer.unobserve(entry.target);
+            console.log('벗어남');
+            $wrapSearch?.classList.add('sticky');
+            // observer.unobserve(entry.target);
+            // observer.observe(el);
+          } else if (isTab && entry.isIntersecting) {
+            console.log('접근');
+            $wrapSearch?.classList.remove('sticky');
+          }
+        });
+      },
+      { threshold: 0 }
+    );
+    observer.observe($tab);
+    return () => {
+      observer && observer.disconnect();
+    };
+  }, []);
+
   return (
     <>
+      <AlphabetScroll alphabet={koAlphabet} />
       <ul>
         {list.map((item) => (
           <RhymeItem key={item.no} subject={item.subject} mean={item.mean} />
@@ -81,6 +137,8 @@ const RhymeList = ({ list, fetchSearchMore, useDictionarySelector, isTab }: Prop
     </>
   );
 };
+
+//String.fromCharCode(65 + i)
 
 export default RhymeList;
 {

@@ -1,0 +1,28 @@
+.alphabet_container {
+  position: fixed;
+  top: 0;
+  right: 3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 50px;
+  height: 100%;
+  height: -moz-available;
+  height: -webkit-fill-available;
+  height: fill-available;
+}
+
+.alphabet_container .item {
+  flex: 1;
+  margin: 0;
+}
+
+.alphabet_container .span {
+  vertical-align: sub;
+}
+
+.alphabet_container .span:hover {
+  border-radius: 10px;
+  background-color: #0064bd;
+  color: #fff;
+}
