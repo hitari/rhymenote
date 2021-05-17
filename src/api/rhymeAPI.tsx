@@ -22,10 +22,13 @@ interface RhymeList {
   list: List[];
 }
 
+const NUM = 671;
+
 // export async function getRhymeList(searchWords?: Word[]) {
 export async function getRhymeList(searchWords?: any, page = 1) {
   const config = {
     data: {
+      offset: NUM,
       page,
       content: searchWords,
     },
