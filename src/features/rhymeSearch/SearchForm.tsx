@@ -4,7 +4,7 @@ import { RootState } from '@/app/rootReducer';
 import { setSearchWords, setSearchValue, setMoumWords } from './RhymeSearchSlice';
 import { fetchRhymeList } from '../rhymeList/RhymeListSlice';
 import { StringToArray } from '@/utils/stringUtils';
-import { wordconvert, syllableConversion } from '@/utils/convertUtils';
+import { wordconvert } from '@/utils/convertUtils';
 
 type InputEvent = ChangeEvent<HTMLInputElement>;
 type ChangeHandler = (e: InputEvent) => void;
@@ -69,7 +69,8 @@ const SearchForm = () => {
       return;
     }
 
-    dispatch(fetchRhymeList(syllableConversion(searchWords).join('/')));
+    // dispatch(fetchRhymeList(syllableConversion(searchWords).join('/')));
+    dispatch(fetchRhymeList(searchWords));
   };
 
   return (

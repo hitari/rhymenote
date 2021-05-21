@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { RootState } from '@/app/rootReducer';
 import { useSelector, useDispatch } from 'react-redux';
 import classnames from 'classnames';
-import { fetchKoSearchMore } from './RhymeListSlice';
+import { fetchKoSearch, fetchKoSearchMore, fetchEnSearchMore } from './RhymeListSlice';
 import { fetchRhymeList } from './RhymeListSlice';
 import RhymeList from './RhymeList';
 
@@ -12,14 +12,11 @@ const RhymeListPage = () => {
   const [tab, setTab] = useState('ko');
 
   const onclickTab = useCallback((e) => setTab(e.currentTarget.dataset.id), [tab]);
-  console.log('-----------');
-  useEffect(() => {
-    dispatch(fetchRhymeList({}));
-  }, []);
+  const isTab = (status: string) => tab === status;
 
   return (
     <article id="content">
-      <div className={classnames('tab_result_left', { selected: tab === 'ko' })}>
+      <div className={classnames('tab_result_left', { selected: isTab('ko') })}>
         <a href="#" className="tit_tab" data-id="ko" onClick={onclickTab}>
           한글
           <span className="num_result" title="전체단어수">
@@ -27,7 +24,7 @@ const RhymeListPage = () => {
           </span>
         </a>
       </div>
-      <div className={classnames('tab_result_right', { selected: tab === 'en' })}>
+      <div className={classnames('tab_result_right', { selected: isTab('en') })}>
         <a href="#" className="tit_tab" data-id="en" onClick={onclickTab}>
           영어
           <span className="num_result" title="전체단어수">
@@ -35,20 +32,22 @@ const RhymeListPage = () => {
           </span>
         </a>
       </div>
-      <section className={classnames('box_result', { selected: tab === 'ko' })}>
+      <section className={classnames('box_result', { selected: isTab('ko') })}>
         <RhymeList
-          list={koDictionary.list}
+          list={koDictionary.docs}
+          fetchSearch={fetchKoSearch}
           fetchSearchMore={fetchKoSearchMore}
-          useDictionarySelector={koDictionary}
-          isTab={tab === 'ko'}
+          dictionary={koDictionary}
+          isTab={isTab('ko')}
         />
       </section>
-      <section className={classnames('box_result', { selected: tab === 'en' })}>
+      <section className={classnames('box_result', { selected: isTab('en') })}>
         <RhymeList
-          list={enDictionary.list}
-          fetchSearchMore={fetchKoSearchMore}
-          useDictionarySelector={koDictionary}
-          isTab={tab === 'en'}
+          list={enDictionary.docs}
+          fetchSearch={fetchKoSearch}
+          fetchSearchMore={fetchEnSearchMore}
+          dictionary={enDictionary}
+          isTab={isTab('en')}
         />
       </section>
     </article>

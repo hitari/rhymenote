@@ -1,9 +1,8 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, ReactEventHandler, ReactElement } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/app/rootReducer';
 import RhymeItem from './RhymeItem';
 import AlphabetScroll from '@/components/alphabetScroll';
-import { syllableConversion } from '@/utils/convertUtils';
 import { useInfinteScroll } from '@/hooks/useInfinteScroll';
 
 interface List {
@@ -14,8 +13,9 @@ interface List {
 
 interface Props {
   list: List[];
+  fetchSearch: any;
   fetchSearchMore: any;
-  useDictionarySelector: any;
+  dictionary: any;
   // fetchSearchMore: AsyncThunk<
   //   any,
   //   {
@@ -27,13 +27,11 @@ interface Props {
   isTab: boolean;
 }
 
-const RhymeList = ({ list, fetchSearchMore, useDictionarySelector, isTab }: Props) => {
+const RhymeList = ({ list, fetchSearch, fetchSearchMore, dictionary, isTab }: Props) => {
   const dispatch = useDispatch();
   const [target, setTarget] = useState<HTMLDivElement | null | undefined>(null);
   const { searchWords, value } = useSelector((state: RootState) => state.rhymeSearch);
-  const { page, hasPrevPage, hasNextPage, loading } = useDictionarySelector;
-
-  console.log('RhymeList');
+  const { page, hasPrevPage, hasNextPage, loading, alphabetList } = dictionary;
 
   const koAlphabet = [
     'ㄱ',
@@ -79,8 +77,9 @@ const RhymeList = ({ list, fetchSearchMore, useDictionarySelector, isTab }: Prop
       if (entry.isIntersecting) {
         if (!hasNextPage) return;
         // observer.unobserve(entry.target);
-        const content = syllableConversion(searchWords).join('/');
-        dispatch(fetchSearchMore({ page: page + 1, content }));
+        // const content = syllableConversion(searchWords).join('/');
+        console.log('IntersectionObserverCallback', page + 1, searchWords);
+        dispatch(fetchSearchMore({ page: page + 1, searchWords }));
       }
     });
   };
@@ -124,9 +123,26 @@ const RhymeList = ({ list, fetchSearchMore, useDictionarySelector, isTab }: Prop
     };
   }, []);
 
+  const handleClickButton = (e: React.MouseEvent<HTMLElement>, id: string, count: number) => {
+    e.preventDefault();
+    if (count === 0) return;
+
+    let offset = 0;
+    for (let i = 0; i < alphabetList.length; i++) {
+      if (alphabetList[i].id === id) break;
+      offset += alphabetList[i].count;
+    }
+
+    window.scrollTo(0, 0);
+    dispatch(fetchSearch({ page: 1, searchWords, offset }));
+  };
+
+  // 결과가 없을경우
+  if (list.length === 0) return <div style={{ textAlign: 'center' }}>결과 값이 존재 하지 않습니다.</div>;
+
   return (
     <>
-      <AlphabetScroll alphabet={koAlphabet} />
+      <AlphabetScroll alphabetList={alphabetList} handleClickButton={handleClickButton} />
       <ul>
         {list.map((item) => (
           <RhymeItem key={item.no} subject={item.subject} mean={item.mean} />

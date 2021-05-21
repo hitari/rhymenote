@@ -1,7 +1,8 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { AppThunk } from '@/app/store';
 import { AxiosError } from 'axios';
-import { getRhymeList, getKoSearch, getEnSearch } from '@/api/rhymeAPI';
+import { KO_CHOSUNG_ALPHABET } from '@/constants/CHARACTERS';
+import { getRhymeList, getKoSearch, getEnSearch, getKoAlphabet } from '@/api/rhymeAPI';
 
 interface RhymeList {
   koDictionary: Dictionary;
@@ -9,7 +10,6 @@ interface RhymeList {
 }
 
 interface Dictionary {
-  list: List[];
   docs: List[];
   totalDocs: number;
   page: number;
@@ -19,6 +19,7 @@ interface Dictionary {
   hasNextPage: boolean;
   loading: string;
   currentRequestId: any;
+  alphabetList?: any;
   error: string | null | undefined;
 }
 
@@ -44,9 +45,36 @@ interface ValidationErrors {
   field_errors: Record<string, string>;
 }
 
+interface Alphabet {
+  count: number;
+  id: string;
+}
+
+const initialKoAlphabet = [
+  { count: 0, id: 'ㄱ' },
+  { count: 0, id: 'ㄲ' },
+  { count: 0, id: 'ㄴ' },
+  { count: 0, id: 'ㄷ' },
+  { count: 0, id: 'ㄸ' },
+  { count: 0, id: 'ㄹ' },
+  { count: 0, id: 'ㅁ' },
+  { count: 0, id: 'ㅂ' },
+  { count: 0, id: 'ㅃ' },
+  { count: 0, id: 'ㅅ' },
+  { count: 0, id: 'ㅆ' },
+  { count: 0, id: 'ㅇ' },
+  { count: 0, id: 'ㅈ' },
+  { count: 0, id: 'ㅉ' },
+  { count: 0, id: 'ㅊ' },
+  { count: 0, id: 'ㅋ' },
+  { count: 0, id: 'ㅌ' },
+  { count: 0, id: 'ㅍ' },
+  { count: 0, id: 'ㅎ' },
+];
+
 const initialDictionary = {
-  list: [],
   docs: [],
+  alphabetList: [...initialKoAlphabet],
   totalDocs: 0,
   page: 0,
   totalPages: 0,
@@ -66,21 +94,29 @@ const initialState: RhymeList = {
 // 전체 검색
 export const fetchRhymeList = createAsyncThunk(
   'rhymeList/fetchRhymeList',
-  async (searchWords: { searchWords?: Word[] }, thunkAPI: any) => {
+  async (searchWords: Word[], thunkAPI: any) => {
     try {
       const { currentRequestId, loading } = thunkAPI.getState().rhymeList.koDictionary;
       if (loading !== 'pending' || thunkAPI.requestId !== currentRequestId) {
         return;
       }
-
+      console.log('rhymeList/fetchRhymeList', searchWords);
+      const alphabetResponse = await getKoAlphabet(searchWords);
       const response = await getRhymeList(searchWords);
+      // const alphabet = JSON.parse(JSON.stringify(initialKoAlphabet));
+      const alphabet = JSON.parse(JSON.stringify(initialKoAlphabet));
+      alphabetResponse.forEach((item: Alphabet) => {
+        const index = KO_CHOSUNG_ALPHABET.indexOf(item.id);
+        if (index === -1) return;
+        alphabet[index].count = item.count;
+      });
+      response.alphabetList = alphabet;
       return response;
     } catch (err) {
       const error: AxiosError<ValidationErrors> = err; // cast the error for access
       if (!error.response) {
         throw err;
       }
-      // We got validation errors, let's return those so we can reference in our component and set form errors
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
@@ -89,47 +125,44 @@ export const fetchRhymeList = createAsyncThunk(
 // 한글 사전 검색
 export const fetchKoSearch = createAsyncThunk(
   'rhymeList/fetchKoSearch',
-  async (payload: { page: number; content: string }, thunkAPI: any) => {
+  async (payload: { searchWords: Word[]; page: number; offset: number }, thunkAPI: any) => {
     try {
-      const { page, content } = payload;
+      const { searchWords, page, offset } = payload;
       const { currentRequestId, loading } = thunkAPI.getState().rhymeList.koDictionary;
       if (loading !== 'pending' || thunkAPI.requestId !== currentRequestId) {
         return;
       }
 
       console.log('rhymeList/fetchKoSearch', payload);
-      const response = await getKoSearch(content, page);
+      const response = await getKoSearch(searchWords, page, offset);
       return response;
     } catch (err) {
       const error: AxiosError<ValidationErrors> = err; // cast the error for access
       if (!error.response) {
         throw err;
       }
-      // We got validation errors, let's return those so we can reference in our component and set form errors
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
 
-// 한글 사전 검색
 export const fetchKoSearchMore = createAsyncThunk(
   'rhymeList/fetchKoSearchMore',
-  async (payload: { page: number; content: string }, thunkAPI: any) => {
+  async (payload: { searchWords: Word[]; page: number }, thunkAPI: any) => {
     try {
-      const { page, content } = payload;
+      const { page, searchWords } = payload;
       const { currentRequestId, loading } = thunkAPI.getState().rhymeList.koDictionary;
       if (loading !== 'pending' || thunkAPI.requestId !== currentRequestId) {
         return;
       }
 
-      const response = await getKoSearch(content, page);
+      const response = await getKoSearch(searchWords, page);
       return response;
     } catch (err) {
       const error: AxiosError<ValidationErrors> = err; // cast the error for access
       if (!error.response) {
         throw err;
       }
-      // We got validation errors, let's return those so we can reference in our component and set form errors
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
@@ -138,23 +171,22 @@ export const fetchKoSearchMore = createAsyncThunk(
 // 영어 사전 검색
 export const fetchEnSearch = createAsyncThunk(
   'rhymeList/fetchEnSearch',
-  async (payload: { page: number; content: string }, thunkAPI: any) => {
+  async (payload: { searchWords: Word[]; page: number }, thunkAPI: any) => {
     try {
-      const { page, content } = payload;
+      const { page, searchWords } = payload;
       const { currentRequestId, loading } = thunkAPI.getState().rhymeList.koDictionary;
       if (loading !== 'pending' || thunkAPI.requestId !== currentRequestId) {
         return;
       }
 
       console.log('rhymeList/fetchEnSearch', payload);
-      const response = await getEnSearch(content, page);
+      const response = await getEnSearch(searchWords, page);
       return response;
     } catch (err) {
       const error: AxiosError<ValidationErrors> = err; // cast the error for access
       if (!error.response) {
         throw err;
       }
-      // We got validation errors, let's return those so we can reference in our component and set form errors
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
@@ -162,15 +194,15 @@ export const fetchEnSearch = createAsyncThunk(
 
 export const fetchEnSearchMore = createAsyncThunk(
   'rhymeList/fetchEnSearchMore',
-  async (payload: { page: number; content: string }, thunkAPI: any) => {
+  async (payload: { searchWords: Word[]; page: number }, thunkAPI: any) => {
     try {
-      const { page, content } = payload;
+      const { page, searchWords } = payload;
       const { currentRequestId, loading } = thunkAPI.getState().rhymeList.koDictionary;
       if (loading !== 'pending' || thunkAPI.requestId !== currentRequestId) {
         return;
       }
 
-      const response = await getEnSearch(content, page);
+      const response = await getEnSearch(searchWords, page);
       return response;
     } catch (err) {
       const error: AxiosError<ValidationErrors> = err; // cast the error for access
@@ -187,9 +219,9 @@ export const rhymeListSlice = createSlice({
   name: 'rhymeList',
   initialState,
   reducers: {
-    getRhymeListSuccess(state, { payload }: PayloadAction<{ list: any[] }>) {
-      const { list } = payload;
-      state.koDictionary.list = list;
+    getRhymeListSuccess(state, { payload }: PayloadAction<{ docs: any[] }>) {
+      const { docs } = payload;
+      state.koDictionary.docs = docs;
     },
   },
   extraReducers: (builder) => {
@@ -202,9 +234,8 @@ export const rhymeListSlice = createSlice({
     });
 
     builder.addCase(fetchKoSearch.fulfilled, (state, { payload }: PayloadAction<Dictionary>) => {
-      const { list, docs, totalDocs, page, totalPages, pagingCounter, hasPrevPage, hasNextPage } = payload;
+      const { docs, totalDocs, page, totalPages, pagingCounter, hasPrevPage, hasNextPage } = payload;
       state.koDictionary.loading = 'idle';
-      state.koDictionary.list = list;
       state.koDictionary.docs = docs;
       state.koDictionary.totalDocs = totalDocs;
       state.koDictionary.page = page;
@@ -223,9 +254,8 @@ export const rhymeListSlice = createSlice({
     });
 
     builder.addCase(fetchKoSearchMore.fulfilled, (state, { payload }: PayloadAction<Dictionary>) => {
-      const { list, docs, totalDocs, page, totalPages, pagingCounter, hasPrevPage, hasNextPage } = payload;
+      const { docs, totalDocs, page, totalPages, pagingCounter, hasPrevPage, hasNextPage } = payload;
       state.koDictionary.loading = 'idle';
-      state.koDictionary.list = [...state.koDictionary.list, ...list];
       state.koDictionary.docs = [...state.koDictionary.docs, ...docs];
       state.koDictionary.totalDocs = totalDocs;
       state.koDictionary.page = page;
@@ -264,9 +294,9 @@ export const rhymeListSlice = createSlice({
     });
 
     builder.addCase(fetchRhymeList.fulfilled, (state, { payload }: PayloadAction<Dictionary>) => {
-      const { list, docs, totalDocs, page, totalPages, pagingCounter, hasPrevPage, hasNextPage } = payload;
+      const { docs, totalDocs, page, totalPages, pagingCounter, hasPrevPage, hasNextPage, alphabetList } = payload;
+
       state.koDictionary.loading = 'idle';
-      state.koDictionary.list = list;
       state.koDictionary.docs = docs;
       state.koDictionary.totalDocs = totalDocs;
       state.koDictionary.page = page;
@@ -274,6 +304,7 @@ export const rhymeListSlice = createSlice({
       state.koDictionary.pagingCounter = pagingCounter;
       state.koDictionary.hasPrevPage = hasPrevPage;
       state.koDictionary.hasNextPage = hasNextPage;
+      state.koDictionary.alphabetList = alphabetList;
     });
 
     builder.addCase(fetchRhymeList.rejected, (state, action: any) => {

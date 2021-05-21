@@ -22,15 +22,15 @@ interface RhymeList {
   list: List[];
 }
 
-const NUM = 671;
+const NUM = 0;
 
 // export async function getRhymeList(searchWords?: Word[]) {
-export async function getRhymeList(searchWords?: any, page = 1) {
+export async function getRhymeList(searchWords: Word[], page = 1) {
   const config = {
     data: {
       offset: NUM,
       page,
-      content: searchWords,
+      content: JSON.stringify(searchWords),
     },
   };
 
@@ -45,11 +45,12 @@ export async function getRhymeSearch() {
   return data;
 }
 
-export async function getKoSearch(content: string, page: number) {
+export async function getKoSearch(searchWords: Word[], page: number, offset = 0) {
   const config = {
     params: {
+      offset,
       page,
-      content,
+      content: JSON.stringify(searchWords),
     },
   };
 
@@ -57,14 +58,25 @@ export async function getKoSearch(content: string, page: number) {
   return data;
 }
 
-export async function getEnSearch(content: string, page: number) {
+export async function getEnSearch(searchWords: Word[], page: number) {
   const config = {
     params: {
       page,
-      content,
+      content: JSON.stringify(searchWords),
     },
   };
 
   const { data } = await axios.get(`${api.apiUrl}/search/en/`, config);
+  return data;
+}
+
+export async function getKoAlphabet(content: Word[]) {
+  const config = {
+    params: {
+      content: JSON.stringify(content),
+    },
+  };
+
+  const { data } = await axios.get(`${api.apiUrl}/search/ko/alphabet`, config);
   return data;
 }
