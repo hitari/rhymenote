@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import className from 'classnames';
 import deepmerge from 'deepmerge';
-import { wordconvert } from '@/utils/convertUtils';
+import { wordConvert } from '@/utils/convertUtils';
 
 interface Character {
   char?: string;
@@ -25,7 +25,7 @@ const WordItem = ({ id, char, selectedWord }: Props) => {
   const [isJungSung, setIsJungSung] = useState(false);
   const [isJongSung, setIsJongSung] = useState(false);
 
-  const [cho, jung, jong] = wordconvert(char);
+  const [cho, jung, jong] = wordConvert(char);
 
   const changeWordStatus = (id: number, status: any) => {
     selectedWord(

@@ -4,34 +4,28 @@ import { RootState } from '@/app/rootReducer';
 import { setSearchWords, setSearchValue, setMoumWords } from './RhymeSearchSlice';
 import { fetchRhymeList } from '../rhymeList/RhymeListSlice';
 import { StringToArray } from '@/utils/stringUtils';
-import { wordconvert } from '@/utils/convertUtils';
+import { wordConvert } from '@/utils/convertUtils';
 
 type InputEvent = ChangeEvent<HTMLInputElement>;
 type ChangeHandler = (e: InputEvent) => void;
 
 const SearchForm = () => {
   const dispatch = useDispatch();
-  const { searchWords, value, convertedValue } = useSelector((state: RootState) => state.rhymeSearch);
+  const { searchWords, value } = useSelector((state: RootState) => state.rhymeSearch);
   const [searchInput, setSearchInput] = useState('');
-  const [prevSearchWords, setPrevSearchWords] = useState<any[]>([]);
-
-  // 검색 문자
-  const characterDecomposition = (word: string) => {
-    dispatch(setSearchValue(word));
-  };
 
   // 글자 분해
   const convertValue = (word: string) => {
     const letters = StringToArray(word);
 
-    const sw = letters.map((char, index) => {
+    const SearchWords = letters.map((char, index) => {
       if (char === searchInput.charAt(index)) {
         // 이전 검색 문자가 같으면 이전 값을 유지
         return searchWords[index];
       }
 
       // 새로운 결과값
-      const [cho, jung, jong] = wordconvert(char);
+      const [cho, jung, jong] = wordConvert(char);
 
       return {
         cho: {
@@ -49,27 +43,28 @@ const SearchForm = () => {
       };
     });
 
-    setPrevSearchWords(sw);
-    dispatch(setSearchWords({ searchWords: sw }));
+    dispatch(setSearchValue(word));
+    dispatch(setSearchWords({ searchWords: SearchWords }));
   };
 
+  // 검색창 검색어 입력 및 삭제시
   const onSearchInputChanged: ChangeHandler = (e: InputEvent) => {
     setSearchInput(e.target.value);
-    characterDecomposition(e.target.value);
     convertValue(e.target.value);
   };
 
+  // 모움 버튼 클릭(후순위 개발)
   const onMoumClicked = () => {
     dispatch(setMoumWords({ searchWords }));
   };
 
+  // 검색 버튼 클릭
   const onSearchClicked = () => {
     if (!value) {
       alert('빈값은 조회가 되지 않습니다.');
       return;
     }
 
-    // dispatch(fetchRhymeList(syllableConversion(searchWords).join('/')));
     dispatch(fetchRhymeList(searchWords));
   };
 
