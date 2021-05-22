@@ -75,4 +75,9 @@ export const KO_JONGSUNG_ALPHABET = [
   'ㅎ',
 ];
 
+export const EN_CAPITAL_ALPHABET = Array(26)
+  .fill('')
+  .map((v, i) => String.fromCharCode(65 + i));
+12593;
+
 export const EN_CHOSUNG_ALPHABET = [];

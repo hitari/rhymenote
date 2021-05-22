@@ -58,10 +58,23 @@ const SearchForm = () => {
     dispatch(setMoumWords({ searchWords }));
   };
 
+  // 라임 선택이 아무것도 되지 않았는지 체크
+  const isNotAllSeleted = () => {
+    return !searchWords.some((word) => {
+      const { cho, jung, jong } = word;
+      return cho.selected || jung.selected || jong.selected;
+    });
+  };
+
   // 검색 버튼 클릭
   const onSearchClicked = () => {
     if (!value) {
-      alert('빈값은 조회가 되지 않습니다.');
+      alert('검색어를 입력해주세요.');
+      return;
+    }
+
+    if (isNotAllSeleted()) {
+      alert('초,중,종성 중 아무것도 선택 되지 않았습니다.\n최소 한개 이상 선택이 되어야합니다.');
       return;
     }
 

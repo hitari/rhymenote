@@ -1,23 +1,27 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { RootState } from '@/app/rootReducer';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import classnames from 'classnames';
 import { fetchKoSearch, fetchKoSearchMore, fetchEnSearchMore } from './RhymeListSlice';
-import { fetchRhymeList } from './RhymeListSlice';
 import RhymeList from './RhymeList';
 
 const RhymeListPage = () => {
-  const dispatch = useDispatch();
   const { koDictionary, enDictionary } = useSelector((state: RootState) => state.rhymeList);
   const [tab, setTab] = useState('ko');
 
-  const onclickTab = useCallback((e) => setTab(e.currentTarget.dataset.id), [tab]);
+  const onclickTab = useCallback(
+    (e) => {
+      e.preventDefault();
+      setTab(e.currentTarget.dataset.id);
+    },
+    [tab]
+  );
   const isTab = (status: string) => tab === status;
 
   return (
     <article id="content">
       <div className={classnames('tab_result_left', { selected: isTab('ko') })}>
-        <a href="#" className="tit_tab" data-id="ko" onClick={onclickTab}>
+        <a href="" className="tit_tab" data-id="ko" onClick={onclickTab}>
           한글
           <span className="num_result" title="전체단어수">
             ({koDictionary.totalDocs})
@@ -25,7 +29,7 @@ const RhymeListPage = () => {
         </a>
       </div>
       <div className={classnames('tab_result_right', { selected: isTab('en') })}>
-        <a href="#" className="tit_tab" data-id="en" onClick={onclickTab}>
+        <a href="" className="tit_tab" data-id="en" onClick={onclickTab}>
           영어
           <span className="num_result" title="전체단어수">
             ({enDictionary.totalDocs})

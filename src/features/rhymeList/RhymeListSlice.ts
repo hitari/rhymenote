@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { AppThunk } from '@/app/store';
 import { AxiosError } from 'axios';
-import { KO_CHOSUNG_ALPHABET } from '@/constants/CHARACTERS';
+import { KO_CHOSUNG_ALPHABET, EN_CAPITAL_ALPHABET } from '@/constants/CHARACTERS';
 import { getRhymeList, getKoSearch, getEnSearch, getKoAlphabet } from '@/api/rhymeAPI';
 
 interface RhymeList {
@@ -50,31 +50,17 @@ interface Alphabet {
   id: string;
 }
 
-const initialKoAlphabet = [
-  { count: 0, id: 'ㄱ' },
-  { count: 0, id: 'ㄲ' },
-  { count: 0, id: 'ㄴ' },
-  { count: 0, id: 'ㄷ' },
-  { count: 0, id: 'ㄸ' },
-  { count: 0, id: 'ㄹ' },
-  { count: 0, id: 'ㅁ' },
-  { count: 0, id: 'ㅂ' },
-  { count: 0, id: 'ㅃ' },
-  { count: 0, id: 'ㅅ' },
-  { count: 0, id: 'ㅆ' },
-  { count: 0, id: 'ㅇ' },
-  { count: 0, id: 'ㅈ' },
-  { count: 0, id: 'ㅉ' },
-  { count: 0, id: 'ㅊ' },
-  { count: 0, id: 'ㅋ' },
-  { count: 0, id: 'ㅌ' },
-  { count: 0, id: 'ㅍ' },
-  { count: 0, id: 'ㅎ' },
-];
+const makeinitialAlphabet = (alphabet: string[]) => {
+  return alphabet.map((char: string) => {
+    return { count: 0, id: char };
+  });
+};
+
+const initialKoAlphabet = makeinitialAlphabet(KO_CHOSUNG_ALPHABET);
+const initialEnAlphabet = makeinitialAlphabet(EN_CAPITAL_ALPHABET);
 
 const initialDictionary = {
   docs: [],
-  alphabetList: [...initialKoAlphabet],
   totalDocs: 0,
   page: 0,
   totalPages: 0,
@@ -87,8 +73,8 @@ const initialDictionary = {
 };
 
 const initialState: RhymeList = {
-  koDictionary: { ...initialDictionary },
-  enDictionary: { ...initialDictionary },
+  koDictionary: { ...initialDictionary, alphabetList: [...initialKoAlphabet] },
+  enDictionary: { ...initialDictionary, alphabetList: [...initialEnAlphabet] },
 };
 
 // 전체 검색
