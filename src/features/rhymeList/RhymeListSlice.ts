@@ -256,7 +256,11 @@ export const rhymeListSlice = createSlice({
     builder.addCase(fetchKoSearchMore.fulfilled, (state, { payload }: PayloadAction<Dictionary>) => {
       const { docs, totalDocs, page, totalPages, pagingCounter, hasPrevPage, hasNextPage } = payload;
       state.koDictionary.loading = 'idle';
-      state.koDictionary.docs = [...state.koDictionary.docs, ...docs];
+      // state.koDictionary.docs = [...state.koDictionary.docs, ...docs];
+      // 페이징시 중복된 값이 넘어오는 경우가 있어서 조치(DB쪽 페이징 쪽 조치필요)
+      state.koDictionary.docs = [
+        ...new Set([...state.koDictionary.docs, ...docs].map((v) => JSON.stringify(v))),
+      ].map((v) => JSON.parse(v));
       state.koDictionary.totalDocs = totalDocs;
       state.koDictionary.page = page;
       state.koDictionary.totalPages = totalPages;

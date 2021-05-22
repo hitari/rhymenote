@@ -76,8 +76,6 @@ const RhymeList = ({ list, fetchSearch, fetchSearchMore, dictionary, isTab }: Pr
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         if (!hasNextPage) return;
-        // observer.unobserve(entry.target);
-        // const content = syllableConversion(searchWords).join('/');
         console.log('IntersectionObserverCallback', page + 1, searchWords);
         dispatch(fetchSearchMore({ page: page + 1, searchWords }));
       }
@@ -103,30 +101,35 @@ const RhymeList = ({ list, fetchSearch, fetchSearchMore, dictionary, isTab }: Pr
     const observer = new IntersectionObserver(
       (entries, observer) => {
         entries.forEach((entry) => {
-          if (isTab && !entry.isIntersecting) {
-            // observer.unobserve(entry.target);
-            console.log('벗어남');
+          if (!isTab) return;
+          // 검색영역 스티키 상태 제어
+          if (!entry.isIntersecting) {
             $wrapSearch?.classList.add('sticky');
-            // observer.unobserve(entry.target);
-            // observer.observe(el);
-          } else if (isTab && entry.isIntersecting) {
-            console.log('접근');
-            $wrapSearch?.classList.remove('sticky');
+            return;
           }
+
+          $wrapSearch?.classList.remove('sticky');
         });
       },
       { threshold: 0 }
     );
     observer.observe($tab);
+
     return () => {
       observer && observer.disconnect();
     };
   }, []);
 
-  const handleClickButton = (e: React.MouseEvent<HTMLElement>, id: string, count: number) => {
+  // 알파벳 스크롤 클릭 이벤트
+  const handleAlphabetScrollClickButton = (e: React.MouseEvent<HTMLElement>, id: string, count: number) => {
     e.preventDefault();
     if (count === 0) return;
 
+    /**
+     * 만약, ㅂ을 클릭해서 해당 위치를 알고싶으면 DB에서 해당 하는 위치 부터 찾으려면 추가 적인 리소스가 들것이다.
+     * 그래서 낸 아이디어가 알파벳은 고정된 순서를 지니고 있으니, ㅂ의 순서를 찾으려면 ㄱ~ㅁ의 총 개수를 더하면
+     * 그 다은 위치는 ㅂ 이라는 것에서 착안해서 해당 시작 되는 위치를 찾기 위해서 앞에 count를 합하는 방식을 넣었다.
+     * */
     let offset = 0;
     for (let i = 0; i < alphabetList.length; i++) {
       if (alphabetList[i].id === id) break;
@@ -142,7 +145,7 @@ const RhymeList = ({ list, fetchSearch, fetchSearchMore, dictionary, isTab }: Pr
 
   return (
     <>
-      <AlphabetScroll alphabetList={alphabetList} handleClickButton={handleClickButton} />
+      <AlphabetScroll alphabetList={alphabetList} handleClickButton={handleAlphabetScrollClickButton} />
       <ul>
         {list.map((item) => (
           <RhymeItem key={item.no} subject={item.subject} mean={item.mean} />
@@ -154,20 +157,4 @@ const RhymeList = ({ list, fetchSearch, fetchSearchMore, dictionary, isTab }: Pr
   );
 };
 
-//String.fromCharCode(65 + i)
-
 export default RhymeList;
-{
-  /* <p className="box_paging">
-<strong className="num_selected">1</strong>
-<a className="num_paging" data-page-id="2">
-  2
-</a>
-<a className="btn_next num_paging" data-page-id="6">
-  다음<span className="txt_arrow">▶</span>
-</a>
-<span className="num_total" title="전체 페이지수">
-  22
-</span>
-</p> */
-}
