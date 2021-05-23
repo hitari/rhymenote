@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { RootState } from '@/app/rootReducer';
 import { useSelector } from 'react-redux';
 import classnames from 'classnames';
-import { fetchKoSearch, fetchKoSearchMore, fetchEnSearchMore } from './RhymeListSlice';
+import { fetchKoSearch, fetchKoSearchMore, fetchEnSearch, fetchEnSearchMore } from './RhymeListSlice';
 import RhymeList from './RhymeList';
 
 const RhymeListPage = () => {
@@ -48,7 +48,7 @@ const RhymeListPage = () => {
       <section className={classnames('box_result', { selected: isTab('en') })}>
         <RhymeList
           list={enDictionary.docs}
-          fetchSearch={fetchKoSearch}
+          fetchSearch={fetchEnSearch}
           fetchSearchMore={fetchEnSearchMore}
           dictionary={enDictionary}
           isTab={isTab('en')}

@@ -124,6 +124,7 @@ const RhymeList = ({ list, fetchSearch, fetchSearchMore, dictionary, isTab }: Pr
   const handleAlphabetScrollClickButton = (e: React.MouseEvent<HTMLElement>, id: string, count: number) => {
     e.preventDefault();
     if (count === 0) return;
+    console.log('id count', id, count);
 
     /**
      * 만약, ㅂ을 클릭해서 해당 위치를 알고싶으면 DB에서 해당 하는 위치 부터 찾으려면 추가 적인 리소스가 들것이다.
